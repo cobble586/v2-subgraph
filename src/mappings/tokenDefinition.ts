@@ -20,61 +20,63 @@ export class TokenDefinition {
 
   // Get all tokens with a static defintion
   static getStaticDefinitions(): Array<TokenDefinition> {
-    let staticDefinitions = new Array<TokenDefinition>(6)
+    let staticDefinitions = new Array<TokenDefinition>(7)
 
-    // Add DGD
-    let tokenDGD = new TokenDefinition(
-      Address.fromString('0xe0b7927c4af23765cb51314a0e0521a9645f0e2a'),
-      'DGD',
-      'DGD',
-      BigInt.fromI32(9)
-    )
-    staticDefinitions.push(tokenDGD)
-
-    // Add AAVE
-    let tokenAAVE = new TokenDefinition(
-      Address.fromString('0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9'),
-      'AAVE',
-      'Aave Token',
+    let tokenNABOX = new TokenDefinition(
+      Address.fromString('0x1A584204Db35460a32e7d9990aC1874cB9FB0827'),
+      'NABOX',
+      'Nabox_Token',
       BigInt.fromI32(18)
     )
-    staticDefinitions.push(tokenAAVE)
+    staticDefinitions.push(tokenNABOX)
 
-    // Add LIF
-    let tokenLIF = new TokenDefinition(
-      Address.fromString('0xeb9951021698b42e4399f9cbb6267aa35f82d59d'),
-      'LIF',
-      'Lif',
+    let tokenWETH = new TokenDefinition(
+      Address.fromString('0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f'),
+      'WETH',
+      'Wrapped Ether',
       BigInt.fromI32(18)
     )
-    staticDefinitions.push(tokenLIF)
+    staticDefinitions.push(tokenWETH)
 
-    // Add SVD
-    let tokenSVD = new TokenDefinition(
-      Address.fromString('0xbdeb4b83251fb146687fa19d1c660f99411eefe3'),
-      'SVD',
-      'savedroid',
+    let tokenUSDC = new TokenDefinition(
+      Address.fromString('0x176211869cA2b568f2A7D4EE941E073a821EE1ff'),
+      'USDC',
+      'USDC',
+      BigInt.fromI32(6)
+    )
+    staticDefinitions.push(tokenUSDC)
+
+    let tokenLinea = new TokenDefinition(
+      Address.fromString('0xB73bE36A9cbD5f3B6658bf584D00787269F59225'),
+      'linea',
+      'linea',
       BigInt.fromI32(18)
     )
-    staticDefinitions.push(tokenSVD)
+    staticDefinitions.push(tokenLinea)
 
-    // Add TheDAO
-    let tokenTheDAO = new TokenDefinition(
-      Address.fromString('0xbb9bc244d798123fde783fcc1c72d3bb8c189413'),
-      'TheDAO',
-      'TheDAO',
-      BigInt.fromI32(16)
-    )
-    staticDefinitions.push(tokenTheDAO)
-
-    // Add HPB
-    let tokenHPB = new TokenDefinition(
-      Address.fromString('0x38c6a68304cdefb9bec48bbfaaba5c5b47818bb2'),
-      'HPB',
-      'HPBCoin',
+    let tokenNerc20 = new TokenDefinition(
+      Address.fromString('0xF3Cb1Dca9fba743952273E353b44976FA58c30eC'),
+      'nerc',
+      'NERC20 Token',
       BigInt.fromI32(18)
     )
-    staticDefinitions.push(tokenHPB)
+    staticDefinitions.push(tokenNerc20)
+
+    let tokenUSDTN = new TokenDefinition(
+      Address.fromString('0x266f4BAe40dC982BE323F3B0208C53CE886FaCfB'),
+      'USDTN',
+      'USDTN',
+      BigInt.fromI32(18)
+    )
+    staticDefinitions.push(tokenUSDTN)
+
+    let tokenNVT = new TokenDefinition(
+      Address.fromString('0xB9B964660b3BD08829824a9e41d1BE376AD81BE3'),
+      'NVT',
+      'NVT',
+      BigInt.fromI32(8)
+    )
+    staticDefinitions.push(tokenNVT)
 
     return staticDefinitions
   }

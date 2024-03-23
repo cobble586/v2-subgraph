@@ -3,14 +3,18 @@ import { Pair, Token, Bundle } from '../types/schema'
 import { BigDecimal, Address, BigInt } from '@graphprotocol/graph-ts/index'
 import { ZERO_BD, factoryContract, ADDRESS_ZERO, ONE_BD, UNTRACKED_PAIRS } from './helpers'
 
-const WETH_ADDRESS = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
-const USDC_WETH_PAIR = '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc' // created 10008355
-const DAI_WETH_PAIR = '0xa478c2975ab1ea89e8196811f51a7b7ade33eb11' // created block 10042267
-const USDT_WETH_PAIR = '0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852' // created block 10093341
+const WETH_ADDRESS = '0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f'
+const USDC_WETH_PAIR = '0x3c0eec2bec278786114077c988511ce5a275c8a8'
 
 export function getEthPriceInUSD(): BigDecimal {
+  let usdcPair = Pair.load(USDC_WETH_PAIR);
+  if (usdcPair !== null) {
+    return usdcPair.token0Price
+  } else {
+    return ZERO_BD
+  }
   // fetch eth prices for each stablecoin
-  let daiPair = Pair.load(DAI_WETH_PAIR) // dai is token0
+  /*let daiPair = Pair.load(DAI_WETH_PAIR) // dai is token0
   let usdcPair = Pair.load(USDC_WETH_PAIR) // usdc is token0
   let usdtPair = Pair.load(USDT_WETH_PAIR) // usdt is token1
 
@@ -35,32 +39,20 @@ export function getEthPriceInUSD(): BigDecimal {
     return usdcPair.token0Price
   } else {
     return ZERO_BD
-  }
+  }*/
 }
 
 // token where amounts should contribute to tracked volume and liquidity
 let WHITELIST: string[] = [
-  '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', // WETH
-  '0x6b175474e89094c44da98b954eedeac495271d0f', // DAI
-  '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // USDC
-  '0xdac17f958d2ee523a2206206994597c13d831ec7', // USDT
-  '0x0000000000085d4780b73119b644ae5ecd22b376', // TUSD
-  '0x5d3a536e4d6dbd6114cc1ead35777bab948e3643', // cDAI
-  '0x39aa39c021dfbae8fac545936693ac917d5e7563', // cUSDC
-  '0x86fadb80d8d2cff3c3680819e4da99c10232ba0f', // EBASE
-  '0x57ab1ec28d129707052df4df418d58a2d46d5f51', // sUSD
-  '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2', // MKR
-  '0xc00e94cb662c3520282e6f5717214004a7f26888', // COMP
-  '0x514910771af9ca656af840dff83e8264ecf986ca', //LINK
-  '0x960b236a07cf122663c4303350609a66a7b288c0', //ANT
-  '0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f', //SNX
-  '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e', //YFI
-  '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8', // yCurv
-  '0x853d955acef822db058eb8505911ed77f175b99e', // FRAX
-  '0xa47c8bf37f92abed4a126bda807a7b7498661acd', // WUST
-  '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984', // UNI
-  '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599', // WBTC
-  '0x956f47f50a910163d8bf957cf5846d573e7f87ca' // FEI
+  '0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f', // WETH
+  '0x176211869cA2b568f2A7D4EE941E073a821EE1ff', // USDC
+  '0xa219439258ca9da29e9cc4ce5596924745e12b93', // USDT
+  '0x4af15ec2a0bd43db75dd04e62faa3b8ef36b00d5', // DAI
+  '0x1A584204Db35460a32e7d9990aC1874cB9FB0827', // NABOX
+  '0xB73bE36A9cbD5f3B6658bf584D00787269F59225', // linea
+  '0xF3Cb1Dca9fba743952273E353b44976FA58c30eC', // nerc
+  '0x266f4BAe40dC982BE323F3B0208C53CE886FaCfB', // USDTN
+  '0xB9B964660b3BD08829824a9e41d1BE376AD81BE3' // NVT
 ]
 
 // minimum liquidity required to count towards tracked volume for pairs with small # of Lps
@@ -78,20 +70,20 @@ export function findEthPerToken(token: Token): BigDecimal {
     return ONE_BD
   }
   // loop through whitelist and check if paired with any
-  for (let i = 0; i < WHITELIST.length; ++i) {
-    let pairAddress = factoryContract.getPair(Address.fromString(token.id), Address.fromString(WHITELIST[i]))
-    if (pairAddress.toHexString() != ADDRESS_ZERO) {
-      let pair = Pair.load(pairAddress.toHexString())
-      if (pair.token0 == token.id && pair.reserveETH.gt(MINIMUM_LIQUIDITY_THRESHOLD_ETH)) {
-        let token1 = Token.load(pair.token1)
-        return pair.token1Price.times(token1.derivedETH as BigDecimal) // return token1 per our token * Eth per token 1
-      }
-      if (pair.token1 == token.id && pair.reserveETH.gt(MINIMUM_LIQUIDITY_THRESHOLD_ETH)) {
-        let token0 = Token.load(pair.token0)
-        return pair.token0Price.times(token0.derivedETH as BigDecimal) // return token0 per our token * ETH per token 0
-      }
-    }
-  }
+  // for (let i = 0; i < WHITELIST.length; ++i) {
+  //   let pairAddress = factoryContract.getPair(Address.fromString(token.id), Address.fromString(WHITELIST[i]))
+  //   if (pairAddress.toHexString() != ADDRESS_ZERO) {
+  //     let pair = Pair.load(pairAddress.toHexString())
+  //     if (pair.token0 == token.id && pair.reserveETH.gt(MINIMUM_LIQUIDITY_THRESHOLD_ETH)) {
+  //       let token1 = Token.load(pair.token1)
+  //       return pair.token1Price.times(token1.derivedETH as BigDecimal) // return token1 per our token * Eth per token 1
+  //     }
+  //     if (pair.token1 == token.id && pair.reserveETH.gt(MINIMUM_LIQUIDITY_THRESHOLD_ETH)) {
+  //       let token0 = Token.load(pair.token0)
+  //       return pair.token0Price.times(token0.derivedETH as BigDecimal) // return token0 per our token * ETH per token 0
+  //     }
+  //   }
+  // }
   return ZERO_BD // nothing was found return 0
 }
 
